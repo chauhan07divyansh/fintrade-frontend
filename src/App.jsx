@@ -15,7 +15,7 @@ const PIE_CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899',
 const formatCurrency = (value) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value || 0);
 
-const formatPercentage = (value) => ${((value ?? 0) * 1).toFixed(1)}%;
+const formatPercentage = (value) => `${((value ?? 0) * 1).toFixed(1)}%`;
 const formatNumber = (value) =>
   new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(value || 0);
 
