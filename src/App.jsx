@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown, Loader, AlertCircle, CheckCircle, Info, X, DollarSign, ClipboardCheck, Activity, BookOpen, Newspaper, Sun, Moon } from 'lucide-react';
 
 // --- API Configuration ---
-// This URL should point to your running Flask backend.
-// It has been updated to use the correct port 7860.
 const API_BASE_URL = 'https://sentiquant-v1.onrender.com';
 
 // --- Helper Functions & Constants ---
@@ -54,7 +52,6 @@ const normalizePortfolioRow = (s) => {
   };
 };
 
-
 const getSentimentClasses = (sentiment) => {
   const s = (sentiment || '').toLowerCase();
   if (s.includes('bullish') || s.includes('positive')) return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
@@ -83,10 +80,16 @@ const getSignalClasses = (signal) => {
 // --- Custom Hooks ---
 const useClickOutside = (ref, handler) => {
   useEffect(() => {
-    const listener = (event) => { if (!ref.current || ref.current.contains(event.target)) return; handler(event); };
+    const listener = (event) => { 
+      if (!ref.current || ref.current.contains(event.target)) return; 
+      handler(event); 
+    };
     document.addEventListener('mousedown', listener);
     document.addEventListener('touchstart', listener);
-    return () => { document.removeEventListener('mousedown', listener); document.removeEventListener('touchstart', listener); };
+    return () => { 
+      document.removeEventListener('mousedown', listener); 
+      document.removeEventListener('touchstart', listener); 
+    };
   }, [ref, handler]);
 };
 
@@ -96,11 +99,15 @@ const useApi = (url, options = {}) => {
   const [error, setError] = useState(null);
 
   const execute = useCallback(async (body = null) => {
-    setLoading(true); setError(null);
+    setLoading(true); 
+    setError(null);
     try {
-      const fetchOptions = { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } };
+      const fetchOptions = { 
+        ...options, 
+        headers: { 'Content-Type': 'application/json', ...options.headers } 
+      };
       if (body) fetchOptions.body = JSON.stringify(body);
-      const response = await fetch(${API_BASE_URL}${url}, fetchOptions);
+      const response = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
       const result = await response.json();
       if (!result.success) throw new Error(result.error || 'An unknown error occurred');
       setData(result.data);
@@ -108,7 +115,9 @@ const useApi = (url, options = {}) => {
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
-    } finally { setLoading(false); }
+    } finally { 
+      setLoading(false); 
+    }
   }, [url, JSON.stringify(options)]);
 
   return { data, loading, error, execute };
@@ -116,7 +125,9 @@ const useApi = (url, options = {}) => {
 
 // --- Reusable UI Components ---
 const Card = ({ children, className = '' }) => (
-  <div className={bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 ${className}}>{children}</div>
+  <div className={`bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 ${className}`}>
+    {children}
+  </div>
 );
 
 const Button = ({ children, onClick, className = '', variant = 'primary', disabled = false }) => {
@@ -125,7 +136,16 @@ const Button = ({ children, onClick, className = '', variant = 'primary', disabl
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-md hover:shadow-lg',
     secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 focus:ring-gray-300 dark:focus:ring-gray-600'
   };
-  return <motion.button whileTap={{ scale: 0.95 }} onClick={onClick} className={${base} ${variants[variant]} ${className}} disabled={disabled}>{children}</motion.button>;
+  return (
+    <motion.button 
+      whileTap={{ scale: 0.95 }} 
+      onClick={onClick} 
+      className={`${base} ${variants[variant]} ${className}`} 
+      disabled={disabled}
+    >
+      {children}
+    </motion.button>
+  );
 };
 
 const Input = ({ placeholder, value, onChange, type = 'text', icon }) => (
@@ -136,15 +156,23 @@ const Input = ({ placeholder, value, onChange, type = 'text', icon }) => (
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className={w-full py-2.5 ${icon ? 'pl-10' : 'pl-4'} pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors}
+      className={`w-full py-2.5 ${icon ? 'pl-10' : 'pl-4'} pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
     />
   </div>
 );
 
 const Select = ({ value, onChange, children, className = '' }) => (
   <div className="relative">
-    <select value={value} onChange={onChange} className={w-full py-2.5 pl-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none ${className}}>{children}</select>
-    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"><ChevronDown className="h-4 w-4 text-gray-400" /></div>
+    <select 
+      value={value} 
+      onChange={onChange} 
+      className={`w-full py-2.5 pl-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none ${className}`}
+    >
+      {children}
+    </select>
+    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+      <ChevronDown className="h-4 w-4 text-gray-400" />
+    </div>
   </div>
 );
 
@@ -156,13 +184,19 @@ const Alert = ({ message, type = 'error', className = '' }) => {
     info: { i: <Info className="h-5 w-5 text-blue-400" />, c: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-500/30' }
   };
   const { i, c } = cfg[type];
-  return <div className={p-4 rounded-lg border flex items-start space-x-3 ${c} ${className}}>{i}<p className="text-sm font-medium">{message}</p></div>;
+  return (
+    <div className={`p-4 rounded-lg border flex items-start space-x-3 ${c} ${className}`}>
+      {i}
+      <p className="text-sm font-medium">{message}</p>
+    </div>
+  );
 };
 
 const LoaderComponent = () => (
   <div className="flex justify-center items-center h-full min-h-[200px] w-full">
     <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
-      <Loader className="animate-spin h-8 w-8" /><span className="text-lg font-semibold">Loading...</span>
+      <Loader className="animate-spin h-8 w-8" />
+      <span className="text-lg font-semibold">Loading...</span>
     </div>
   </div>
 );
@@ -180,11 +214,19 @@ const SkeletonLoader = () => (
 );
 
 const TabButton = ({ isActive, onClick, children }) => (
-  <button onClick={onClick} className={px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors border-b-2 ${isActive ? 'text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400' : 'text-gray-500 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}}>{children}</button>
+  <button 
+    onClick={onClick} 
+    className={`px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors border-b-2 ${isActive ? 'text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400' : 'text-gray-500 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
+  >
+    {children}
+  </button>
 );
 
 const EmptyState = ({ message, icon }) => (
-  <div className="text-center py-12 px-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">{icon || <Info className="h-10 w-10 text-gray-400 mx-auto mb-4" />}<p className="text-gray-600 dark:text-gray-400 font-medium">{message}</p></div>
+  <div className="text-center py-12 px-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+    {icon || <Info className="h-10 w-10 text-gray-400 mx-auto mb-4" />}
+    <p className="text-gray-600 dark:text-gray-400 font-medium">{message}</p>
+  </div>
 );
 
 // --- Core Application Components ---
@@ -192,13 +234,22 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
   const [openMenu, setOpenMenu] = useState(null);
   const dropdownRef = useRef(null);
   useClickOutside(dropdownRef, () => setOpenMenu(null));
-  const navItems = [{ name: 'Home', page: 'home' }, { name: 'Stocks', page: 'stocks' }, { name: 'Swing Trading', page: 'swing', subItems: ['View All Stocks', 'Analyze Stock', 'Create Portfolio'] }, { name: 'Position Trading', page: 'position', subItems: ['View All Stocks', 'Analyze Stock', 'Create Portfolio'] }, { name: 'Compare', page: 'compare' }];
+  
+  const navItems = [
+    { name: 'Home', page: 'home' }, 
+    { name: 'Stocks', page: 'stocks' }, 
+    { name: 'Swing Trading', page: 'swing', subItems: ['View All Stocks', 'Analyze Stock', 'Create Portfolio'] }, 
+    { name: 'Position Trading', page: 'position', subItems: ['View All Stocks', 'Analyze Stock', 'Create Portfolio'] }, 
+    { name: 'Compare', page: 'compare' }
+  ];
+  
   const handleSubItemClick = (mainPage, subItem) => {
     if (subItem === 'View All Stocks') setPage('stocks');
-    else if (subItem === 'Analyze Stock') setPage(analyze_${mainPage});
-    else if (subItem === 'Create Portfolio') setPage(portfolio_${mainPage});
+    else if (subItem === 'Analyze Stock') setPage(`analyze_${mainPage}`);
+    else if (subItem === 'Create Portfolio') setPage(`portfolio_${mainPage}`);
     setOpenMenu(null);
   };
+  
   return (
     <nav className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-md sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -218,9 +269,13 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
                   {item.subItems && <ChevronDown className="ml-1 h-4 w-4" />}
                 </button>
                 {item.subItems && openMenu === item.page && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="absolute mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 py-1 z-50">
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    className="absolute mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 py-1 z-50"
+                  >
                     {item.subItems.map(sub => (
-                      <a
+                      
                         key={sub}
                         href="#"
                         onClick={e => { e.preventDefault(); handleSubItemClick(item.page, sub); }}
@@ -233,7 +288,10 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
                 )}
               </div>
             ))}
-            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400">
+            <button 
+              onClick={toggleTheme} 
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+            >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </button>
           </div>
@@ -242,13 +300,21 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
     </nav>
   );
 };
-
 const HomePage = () => (
   <div className="relative text-center p-8 py-16 md:py-24 overflow-hidden rounded-xl">
     <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-green-900/30 animate-gradient-xy"></div>
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative z-10">
-      <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-gray-100 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">Welcome to FinTrade</h1>
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">Your AI-powered platform for Swing and Position trading analysis. Get data-driven insights to make smarter investment decisions.</p>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.5 }} 
+      className="relative z-10"
+    >
+      <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-gray-100 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">
+        Welcome to FinTrade
+      </h1>
+      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+        Your AI-powered platform for Swing and Position trading analysis. Get data-driven insights to make smarter investment decisions.
+      </p>
     </motion.div>
   </div>
 );
@@ -256,13 +322,21 @@ const HomePage = () => (
 const StocksListPage = ({ onStockSelect }) => {
   const { data, loading, error, execute } = useApi('/api/stocks');
   const [searchTerm, setSearchTerm] = useState('');
+  
   useEffect(() => { execute(); }, [execute]);
+  
   const filteredStocks = data?.stocks?.filter(stock => stock.toLowerCase().includes(searchTerm.toLowerCase())) || [];
+  
   return (
     <div>
       <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6">All Available Stocks</h2>
       <div className="mb-6">
-        <Input placeholder="Search for a stock symbol..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} icon={<Search className="h-5 w-5 text-gray-400" />} />
+        <Input 
+          placeholder="Search for a stock symbol..." 
+          value={searchTerm} 
+          onChange={e => setSearchTerm(e.target.value)} 
+          icon={<Search className="h-5 w-5 text-gray-400" />} 
+        />
       </div>
       {loading && <LoaderComponent />}
       {error && <Alert message={error} />}
@@ -271,7 +345,12 @@ const StocksListPage = ({ onStockSelect }) => {
           <div className="max-h-[60vh] overflow-y-auto">
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredStocks.length > 0 ? filteredStocks.map(stock => (
-                <motion.li key={stock} onClick={() => onStockSelect(stock)} className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" whileHover={{ scale: 1.02 }}>
+                <motion.li 
+                  key={stock} 
+                  onClick={() => onStockSelect(stock)} 
+                  className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" 
+                  whileHover={{ scale: 1.02 }}
+                >
                   <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{stock}</span>
                 </motion.li>
               )) : <p className="p-4 text-center text-gray-500">No stocks found.</p>}
@@ -288,6 +367,7 @@ const DataGrid = ({ data }) => {
   if (!data || typeof data !== 'object') return <EmptyState message="No data available for this section." />;
   const validEntries = Object.entries(data).filter(([_, value]) => typeof value === 'string' || typeof value === 'number');
   if (validEntries.length === 0) return <EmptyState message="No valid data points to display." />;
+  
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       {validEntries.map(([key, value]) => (
@@ -302,24 +382,33 @@ const DataGrid = ({ data }) => {
 
 const TradingPlanTab = ({ plan }) => {
   if (!plan) return <EmptyState message="Trading plan is currently unavailable." />;
+  
   return (
     <div className="p-2">
       <div className="text-center mb-6">
         <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">AI Signal</p>
-        <span className={px-6 py-3 text-2xl font-bold rounded-full ${getSignalClasses(plan.signal)}}>{plan.signal}</span>
+        <span className={`px-6 py-3 text-2xl font-bold rounded-full ${getSignalClasses(plan.signal)}`}>
+          {plan.signal}
+        </span>
       </div>
       <div className="mb-6">
         <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Strategy</h4>
-        <p className="text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500">{plan.strategy}</p>
+        <p className="text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500">
+          {plan.strategy}
+        </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
         <div className="p-4 bg-gray-100 dark:bg-gray-900/50 rounded-lg">
           <p className="text-sm text-gray-500 dark:text-gray-400">Entry Price</p>
-          <p className="text-xl font-bold text-gray-800 dark:text-gray-200">{formatCurrency(num(plan.entry_price))}</p>
+          <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
+            {formatCurrency(num(plan.entry_price))}
+          </p>
         </div>
         <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
           <p className="text-sm text-red-600 dark:text-red-400">Stop-Loss</p>
-          <p className="text-xl font-bold text-red-800 dark:text-red-300">{formatCurrency(num(plan.stop_loss))}</p>
+          <p className="text-xl font-bold text-red-800 dark:text-red-300">
+            {formatCurrency(num(plan.stop_loss))}
+          </p>
         </div>
       </div>
       <div className="mb-6">
@@ -327,21 +416,29 @@ const TradingPlanTab = ({ plan }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
           <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <p className="text-sm text-green-600 dark:text-green-400">Target 1</p>
-            <p className="text-xl font-bold text-green-800 dark:text-green-300">{formatCurrency(num(plan.target_1))}</p>
+            <p className="text-xl font-bold text-green-800 dark:text-green-300">
+              {formatCurrency(num(plan.target_1))}
+            </p>
           </div>
           <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <p className="text-sm text-green-600 dark:text-green-400">Target 2</p>
-            <p className="text-xl font-bold text-green-800 dark:text-green-300">{formatCurrency(num(plan.target_2))}</p>
+            <p className="text-xl font-bold text-green-800 dark:text-green-300">
+              {formatCurrency(num(plan.target_2))}
+            </p>
           </div>
           <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <p className="text-sm text-green-600 dark:text-green-400">Target 3</p>
-            <p className="text-xl font-bold text-green-800 dark:text-green-300">{formatCurrency(num(plan.target_3))}</p>
+            <p className="text-xl font-bold text-green-800 dark:text-green-300">
+              {formatCurrency(num(plan.target_3))}
+            </p>
           </div>
         </div>
       </div>
       <div>
         <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Trade Management Advice</h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">{plan.trailing_stop_advice}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">
+          {plan.trailing_stop_advice}
+        </p>
       </div>
     </div>
   );
@@ -351,7 +448,9 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="p-2 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <p className="font-bold text-gray-800 dark:text-gray-200">{formatCurrency(num(payload[0].value))}</p>
+        <p className="font-bold text-gray-800 dark:text-gray-200">
+          {formatCurrency(num(payload[0].value))}
+        </p>
       </div>
     );
   }
@@ -364,26 +463,36 @@ const AnalysisSummaryTab = ({ data }) => {
       <div className="space-y-4">
         <div className="flex justify-between items-baseline p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
           <span className="text-gray-600 dark:text-gray-400">Current Price</span>
-          <span className="text-2xl font-bold text-gray-800 dark:text-gray-200">{formatCurrency(num(data.current_price))}</span>
+          <span className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            {formatCurrency(num(data.current_price))}
+          </span>
         </div>
         <div className="flex justify-between items-baseline p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
           <span className="text-green-700 dark:text-green-400">Main Target Price</span>
-          <span className="text-2xl font-bold text-green-800 dark:text-green-300">{formatCurrency(num(data.target_price))}</span>
+          <span className="text-2xl font-bold text-green-800 dark:text-green-300">
+            {formatCurrency(num(data.target_price))}
+          </span>
         </div>
         <div className="flex justify-between items-baseline p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <span className="text-blue-700 dark:text-blue-400">Potential Return (to Main Target)</span>
-          <span className="text-2xl font-bold text-blue-800 dark:text-blue-300">{formatPercentage(num(data.potential_return))}</span>
+          <span className="text-2xl font-bold text-blue-800 dark:text-blue-300">
+            {formatPercentage(num(data.potential_return))}
+          </span>
         </div>
       </div>
       <div className="p-4 border dark:border-gray-700 rounded-lg">
         <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Analysis Scorecard</h4>
         <div className="flex justify-between items-center mb-1">
           <span className="text-gray-600 dark:text-gray-400">Investment Grade</span>
-          <span className={font-bold text-lg ${getGradeColor(data.investment_grade)}}>{data.investment_grade}</span>
+          <span className={`font-bold text-lg ${getGradeColor(data.investment_grade)}`}>
+            {data.investment_grade}
+          </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-gray-600 dark:text-gray-400">AI Score</span>
-          <span className="font-bold text-lg text-gray-800 dark:text-gray-200">{(num(data.overall_score)).toFixed(2)} / 100</span>
+          <span className="font-bold text-lg text-gray-800 dark:text-gray-200">
+            {(num(data.overall_score)).toFixed(2)} / 100
+          </span>
         </div>
       </div>
     </div>
@@ -392,6 +501,7 @@ const AnalysisSummaryTab = ({ data }) => {
 
 const SentimentNewsTab = ({ data }) => {
   const { mda_tone, mda_score, ...marketSentiment } = data.sentiment || {};
+  
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 dark:text-gray-200">Market Sentiment</h3>
@@ -401,7 +511,11 @@ const SentimentNewsTab = ({ data }) => {
           <h3 className="text-xl font-bold mb-4 dark:text-gray-200">Management Analysis (MDA) Tone</h3>
           <Card className="text-center">
             <p className="text-2xl font-bold text-blue-500 dark:text-blue-400">{mda_tone}</p>
-            {mda_score && <p className="text-sm text-gray-500 dark:text-gray-400">Score: {num(mda_score).toFixed(2)}</p>}
+            {mda_score && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Score: {num(mda_score).toFixed(2)}
+              </p>
+            )}
           </Card>
         </div>
       )}
@@ -411,6 +525,7 @@ const SentimentNewsTab = ({ data }) => {
 
 const AnalysisCard = ({ data, loading }) => {
   const [activeTab, setActiveTab] = useState('plan');
+  
   if (loading) return <SkeletonLoader />;
   if (!data) return null;
 
@@ -421,25 +536,53 @@ const AnalysisCard = ({ data, loading }) => {
     { id: 'fundamentals', label: 'Fundamentals', icon: <BookOpen className="h-4 w-4 mr-2" /> },
     { id: 'sentiment', label: 'Sentiment', icon: <Newspaper className="h-4 w-4 mr-2" /> }
   ];
+  
   const tabs = data.system_type === 'Swing' ? baseTabs.filter(tab => tab.id !== 'fundamentals') : baseTabs;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.5 }}
+    >
       <Card>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{data.company_name}</h3>
-            <p className="font-mono text-lg text-blue-600 dark:text-blue-400">{data.symbol}</p>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {data.company_name}
+            </h3>
+            <p className="font-mono text-lg text-blue-600 dark:text-blue-400">
+              {data.symbol}
+            </p>
           </div>
-          <span className={px-3 py-1 text-sm font-semibold rounded-full ${getSentimentClasses(data.sentiment?.overall_sentiment)}}>{data.sentiment?.overall_sentiment || 'Neutral'}</span>
+          <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getSentimentClasses(data.sentiment?.overall_sentiment)}`}>
+            {data.sentiment?.overall_sentiment || 'Neutral'}
+          </span>
         </div>
         <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
           <nav className="-mb-px flex space-x-4 overflow-x-auto">
-            {tabs.map(tab => <TabButton key={tab.id} isActive={activeTab === tab.id} onClick={() => setActiveTab(tab.id)}><span className="flex items-center">{tab.icon}{tab.label}</span></TabButton>)}
+            {tabs.map(tab => (
+              <TabButton 
+                key={tab.id} 
+                isActive={activeTab === tab.id} 
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <span className="flex items-center">
+                  {tab.icon}
+                  {tab.label}
+                </span>
+              </TabButton>
+            ))}
           </nav>
         </div>
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+          <motion.div 
+            key={activeTab} 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -10 }} 
+            transition={{ duration: 0.2 }}
+          >
             {activeTab === 'plan' && <TradingPlanTab plan={data.trading_plan} />}
             {activeTab === 'summary' && <AnalysisSummaryTab data={data} />}
             {activeTab === 'technicals' && <DataGrid data={data.technical_indicators} />}
@@ -454,17 +597,33 @@ const AnalysisCard = ({ data, loading }) => {
 
 const AnalysisPage = ({ type }) => {
   const [symbol, setSymbol] = useState('');
-  const { data, loading, error, execute } = useApi(/api/analyze/${type}/${symbol}, { method: 'GET' });
-  const handleAnalyze = e => { e.preventDefault(); if (symbol.trim()) execute(); };
+  const { data, loading, error, execute } = useApi(`/api/analyze/${type}/${symbol}`, { method: 'GET' });
+  
+  const handleAnalyze = e => { 
+    e.preventDefault(); 
+    if (symbol.trim()) execute(); 
+  };
+  
   return (
     <div>
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2 capitalize">{type} Trading Analysis</h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">Enter a stock symbol to get a detailed AI-powered analysis.</p>
+      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2 capitalize">
+        {type} Trading Analysis
+      </h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        Enter a stock symbol to get a detailed AI-powered analysis.
+      </p>
       <form onSubmit={handleAnalyze} className="flex items-center gap-4 mb-6">
         <div className="flex-grow">
-          <Input placeholder="e.g., RELIANCE.NS" value={symbol} onChange={e => setSymbol(e.target.value.toUpperCase())} icon={<Search className="h-5 w-5 text-gray-400" />} />
+          <Input 
+            placeholder="e.g., RELIANCE.NS" 
+            value={symbol} 
+            onChange={e => setSymbol(e.target.value.toUpperCase())} 
+            icon={<Search className="h-5 w-5 text-gray-400" />} 
+          />
         </div>
-        <Button onClick={handleAnalyze} disabled={loading || !symbol.trim()}>{loading ? <Loader className="animate-spin h-5 w-5" /> : 'Analyze'}</Button>
+        <Button onClick={handleAnalyze} disabled={loading || !symbol.trim()}>
+          {loading ? <Loader className="animate-spin h-5 w-5" /> : 'Analyze'}
+        </Button>
       </form>
       {error && <Alert message={error} />}
       <AnalysisCard data={data} loading={loading} />
@@ -477,30 +636,39 @@ const PortfolioResults = ({ data, loading }) => {
   if (!data || !data.portfolio || data.portfolio.length === 0) {
     return <EmptyState message="No portfolio to display. Adjust your criteria and try again." className="mt-8" />;
   }
+  
   const { portfolio, summary } = data;
-
-  // Normalize all rows once for consistent rendering
   const rows = portfolio.map(normalizePortfolioRow);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8">
-      <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Your Personalized Portfolio</h3>
+      <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+        Your Personalized Portfolio
+      </h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
         <Card>
           <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Total Budget</h4>
-          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(num(summary.total_budget))}</p>
+          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            {formatCurrency(num(summary.total_budget))}
+          </p>
         </Card>
         <Card>
           <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Total Allocated</h4>
-          <p className="text-3xl font-bold text-green-600 dark:text-green-400">{formatCurrency(num(summary.total_allocated))}</p>
+          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+            {formatCurrency(num(summary.total_allocated))}
+          </p>
         </Card>
         <Card>
           <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Positions</h4>
-          <p className="text-3xl font-bold text-gray-600 dark:text-gray-300">{summary.diversification}</p>
+          <p className="text-3xl font-bold text-gray-600 dark:text-gray-300">
+            {summary.diversification}
+          </p>
         </Card>
         <Card>
           <h4 className="font-bold text-lg mb-2 dark:text-gray-200">Avg. Score</h4>
-          <p className="text-3xl font-bold text-gray-600 dark:text-gray-300">{num(summary.average_score).toFixed(1)} / 100</p>
+          <p className="text-3xl font-bold text-gray-600 dark:text-gray-300">
+            {num(summary.average_score).toFixed(1)} / 100
+          </p>
         </Card>
       </div>
       <Card>
@@ -523,15 +691,33 @@ const PortfolioResults = ({ data, loading }) => {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {rows.map((s, index) => (
                 <tr key={s.symbol || index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">{index + 1}</td>
-                  <td className="p-3 text-sm font-mono font-semibold text-blue-600 dark:text-blue-400">{s.symbol}</td>
-                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap">{s.company}</td>
-                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">{s.score ? s.score.toFixed(0) : 'N/A'}</td>
-                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">{formatCurrency(num(s.price))}</td>
-                  <td className="p-3 text-sm text-red-600 dark:text-red-400 text-right">{formatCurrency(num(s.stop_loss))}</td>
-                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">{formatPercentage(num(s.percentage_allocation))}</td>
-                  <td className="p-3 text-sm font-semibold text-gray-800 dark:text-gray-200 text-right">{formatNumber(num(s.number_of_shares))}</td>
-                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">{formatCurrency(num(s.risk))}</td>
+                  <td className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {index + 1}
+                  </td>
+                  <td className="p-3 text-sm font-mono font-semibold text-blue-600 dark:text-blue-400">
+                    {s.symbol}
+                  </td>
+                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap">
+                    {s.company}
+                  </td>
+                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">
+                    {s.score ? s.score.toFixed(0) : 'N/A'}
+                  </td>
+                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">
+                    {formatCurrency(num(s.price))}
+                  </td>
+                  <td className="p-3 text-sm text-red-600 dark:text-red-400 text-right">
+                    {formatCurrency(num(s.stop_loss))}
+                  </td>
+                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">
+                    {formatPercentage(num(s.percentage_allocation))}
+                  </td>
+                  <td className="p-3 text-sm font-semibold text-gray-800 dark:text-gray-200 text-right">
+                    {formatNumber(num(s.number_of_shares))}
+                  </td>
+                  <td className="p-3 text-sm text-gray-800 dark:text-gray-200 text-right">
+                    {formatCurrency(num(s.risk))}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -546,7 +732,7 @@ const PortfolioPage = ({ type }) => {
   const [budget, setBudget] = useState('100000');
   const [risk, setRisk] = useState('MEDIUM');
   const [timePeriod, setTimePeriod] = useState('18');
-  const { data, loading, error, execute } = useApi(/api/portfolio/${type}, { method: 'POST' });
+  const { data, loading, error, execute } = useApi(`/api/portfolio/${type}`, { method: 'POST' });
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -557,25 +743,40 @@ const PortfolioPage = ({ type }) => {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2 capitalize">{type} Portfolio Builder</h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">Create a personalized portfolio based on your financial goals.</p>
+      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2 capitalize">
+        {type} Portfolio Builder
+      </h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        Create a personalized portfolio based on your financial goals.
+      </p>
       <Card>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div>
-            <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">Budget (INR)</label>
-            <Input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder="e.g. 100000" />
+            <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">
+              Budget (INR)
+            </label>
+            <Input 
+              type="number" 
+              value={budget} 
+              onChange={e => setBudget(e.target.value)} 
+              placeholder="e.g. 100000" 
+            />
           </div>
           <div>
-            <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">Risk Appetite</label>
+            <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">
+              Risk Appetite
+            </label>
             <Select value={risk} onChange={e => setRisk(e.target.value)}>
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
               <option value="HIGH">High</option>
             </Select>
           </div>
-          {type === 'position' &&
+          {type === 'position' && (
             <div>
-              <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">Time Period</label>
+              <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-2">
+                Time Period
+              </label>
               <Select value={timePeriod} onChange={e => setTimePeriod(e.target.value)}>
                 <option value="9">9 Months</option>
                 <option value="18">18 Months</option>
@@ -583,7 +784,7 @@ const PortfolioPage = ({ type }) => {
                 <option value="60">60 Months</option>
               </Select>
             </div>
-          }
+          )}
           <div className={type === 'swing' ? 'md:col-start-3' : ''}>
             <Button onClick={handleSubmit} disabled={loading} className="w-full">
               {loading ? <Loader className="animate-spin h-5 w-5 mx-auto" /> : 'Build Portfolio'}
@@ -599,7 +800,7 @@ const PortfolioPage = ({ type }) => {
 
 const ComparePage = ({ initialSymbol, onSymbolChange }) => {
   const [symbol, setSymbol] = useState(initialSymbol || '');
-  const { data, loading, error, execute } = useApi(/api/compare/${symbol});
+  const { data, loading, error, execute } = useApi(`/api/compare/${symbol}`);
 
   const executeComparison = useCallback(() => {
     if (symbol.trim()) {
@@ -631,8 +832,12 @@ const ComparePage = ({ initialSymbol, onSymbolChange }) => {
     <div>
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Compare Trading Strategies</h2>
-          <p className="text-gray-600 dark:text-gray-400">Get a side-by-side view of Swing and Position trading analysis for a stock.</p>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+            Compare Trading Strategies
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Get a side-by-side view of Swing and Position trading analysis for a stock.
+          </p>
         </div>
       </div>
       <form onSubmit={handleCompare} className="flex items-center gap-4 mb-6">
@@ -650,18 +855,26 @@ const ComparePage = ({ initialSymbol, onSymbolChange }) => {
       </form>
       {error && <Alert message={error} />}
       {loading && <SkeletonLoader />}
-      {data &&
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      {data && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          className="grid grid-cols-1 xl:grid-cols-2 gap-8"
+        >
           <div>
-            <h3 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-400">Swing Analysis</h3>
+            <h3 className="text-2xl font-bold text-center mb-4 text-blue-600 dark:text-blue-400">
+              Swing Analysis
+            </h3>
             <AnalysisCard data={data.swing_analysis} />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-center mb-4 text-green-600 dark:text-green-400">Position Analysis</h3>
+            <h3 className="text-2xl font-bold text-center mb-4 text-green-600 dark:text-green-400">
+              Position Analysis
+            </h3>
             <AnalysisCard data={data.position_analysis} />
           </div>
         </motion.div>
-      }
+      )}
     </div>
   );
 };
@@ -691,14 +904,22 @@ const App = () => {
 
   const renderPage = () => {
     switch (page) {
-      case 'home': return <HomePage />;
-      case 'stocks': return <StocksListPage onStockSelect={handleStockSelection} />;
-      case 'analyze_swing': return <AnalysisPage type="swing" />;
-      case 'analyze_position': return <AnalysisPage type="position" />;
-      case 'portfolio_swing': return <PortfolioPage type="swing" />;
-      case 'portfolio_position': return <PortfolioPage type="position" />;
-      case 'compare': return <ComparePage initialSymbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />;
-      default: return <HomePage />;
+      case 'home': 
+        return <HomePage />;
+      case 'stocks': 
+        return <StocksListPage onStockSelect={handleStockSelection} />;
+      case 'analyze_swing': 
+        return <AnalysisPage type="swing" />;
+      case 'analyze_position': 
+        return <AnalysisPage type="position" />;
+      case 'portfolio_swing': 
+        return <PortfolioPage type="swing" />;
+      case 'portfolio_position': 
+        return <PortfolioPage type="position" />;
+      case 'compare': 
+        return <ComparePage initialSymbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />;
+      default: 
+        return <HomePage />;
     }
   };
 
@@ -707,7 +928,13 @@ const App = () => {
       <Navbar setPage={setPage} theme={theme} toggleTheme={toggleTheme} />
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <AnimatePresence mode="wait">
-          <motion.div key={page} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
+          <motion.div 
+            key={page} 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -20 }} 
+            transition={{ duration: 0.3 }}
+          >
             {renderPage()}
           </motion.div>
         </AnimatePresence>
