@@ -6,7 +6,7 @@ import { Search, ChevronDown, Loader, AlertCircle, CheckCircle, Info, X, DollarS
 // --- API Configuration ---
 // This URL should point to your running Flask backend.
 // It has been updated to use the correct port 7860.
-const API_BASE_URL = 'https://sentiquant.onrender.com';
+const API_BASE_URL = 'https://sentiquant-v1.onrender.com';
 
 // --- Helper Functions & Constants ---
 const COLORS = { primary: '#10B981', secondary: '#3B82F6', neutral: '#6B7281', danger: '#EF4444', background: '#F9FAFB', card: '#FFFFFF', text: '#1F2937', subtleText: '#6B7281' };
