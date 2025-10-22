@@ -275,7 +275,7 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
                     className="absolute mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 py-1 z-50"
                   >
                     {item.subItems.map(sub => (
-                      
+                      <a
                         key={sub}
                         href="#"
                         onClick={e => { e.preventDefault(); handleSubItemClick(item.page, sub); }}
