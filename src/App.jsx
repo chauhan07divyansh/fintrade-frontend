@@ -256,7 +256,7 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center cursor-pointer" onClick={() => setPage('home')}>
             <DollarSign className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-xl font-bold text-gray-800 dark:text-gray-200">FinTrade</span>
+            <span className="ml-2 text-xl font-bold text-gray-800 dark:text-gray-200">SentiQuant</span>
           </div>
           <div className="hidden md:flex items-center space-x-2" ref={dropdownRef}>
             {navItems.map(item => (
@@ -310,7 +310,7 @@ const HomePage = () => (
       className="relative z-10"
     >
       <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-gray-100 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">
-        Welcome to FinTrade
+        Welcome to SentiQuant
       </h1>
       <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
         Your AI-powered platform for Swing and Position trading analysis. Get data-driven insights to make smarter investment decisions.
