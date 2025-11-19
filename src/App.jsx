@@ -229,6 +229,47 @@ const EmptyState = ({ message, icon }) => (
   </div>
 );
 
+// --- Disclaimer Footer Component ---
+const DisclaimerFooter = () => {
+  const [showFull, setShowFull] = useState(false);
+  const [disclaimer, setDisclaimer] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/disclaimer`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setDisclaimer(data.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!disclaimer) return null;
+
+  return (
+    <div className="bg-amber-50 dark:bg-amber-900/20 border-t border-amber-200 dark:border-amber-800 py-4 px-6 mt-8">
+      <div className="container mx-auto">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-grow">
+            <p className="text-xs text-amber-900 dark:text-amber-100 font-semibold mb-1">
+              LEGAL DISCLAIMER
+            </p>
+            <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+              {showFull ? disclaimer.text : `${disclaimer.text.substring(0, 200)}...`}
+            </p>
+            <button
+              onClick={() => setShowFull(!showFull)}
+              className="text-xs text-amber-700 dark:text-amber-300 font-semibold mt-2 hover:underline focus:outline-none"
+            >
+              {showFull ? 'Show Less' : 'Read Full Disclaimer'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Core Application Components ---
 const Navbar = ({ setPage, theme, toggleTheme }) => {
   const [openMenu, setOpenMenu] = useState(null);
@@ -300,6 +341,7 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
     </nav>
   );
 };
+
 const HomePage = () => (
   <div className="relative text-center p-8 py-16 md:py-24 overflow-hidden rounded-xl">
     <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-green-900/30 animate-gradient-xy"></div>
@@ -924,9 +966,9 @@ const App = () => {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-300 flex flex-col">
       <Navbar setPage={setPage} theme={theme} toggleTheme={toggleTheme} />
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 flex-grow">
         <AnimatePresence mode="wait">
           <motion.div 
             key={page} 
@@ -939,6 +981,7 @@ const App = () => {
           </motion.div>
         </AnimatePresence>
       </main>
+      <DisclaimerFooter />
     </div>
   );
 };
