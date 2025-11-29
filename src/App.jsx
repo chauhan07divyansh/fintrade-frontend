@@ -17,7 +17,7 @@ const formatPercentage = (value) => `${((value ?? 0) * 1).toFixed(1)}%`;
 const formatNumber = (value) =>
   new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(value || 0);
 
-// Strong numeric coercer for backend strings like "₹1,234.56", "9.9 %", etc.
+// Strong numeric coercer for backend strings
 const num = (v) => {
   if (v === null || v === undefined || v === '') return 0;
   if (typeof v === 'number') return isFinite(v) ? v : 0;
@@ -26,18 +26,13 @@ const num = (v) => {
   return isNaN(parsed) ? 0 : parsed;
 };
 
-// Normalize one portfolio row to consistent keys used by the UI
+// Normalize portfolio row
 const normalizePortfolioRow = (s) => {
-  const price =
-    s.price ?? s.current_price ?? s.entry_price ?? s.avg_price ?? s.ltp ?? 0;
-  const stopLoss =
-    s.stop_loss ?? s.stoploss ?? s.sl ?? s.stop ?? 0;
-  const alloc =
-    s.percentage_allocation ?? s.allocation_pct ?? s.alloc_percent ?? s.allocation ?? 0;
-  const shares =
-    s.number_of_shares ?? s.shares ?? s.qty ?? s.quantity ?? 0;
-  const risk =
-    s.risk ?? s.risk_amount ?? s.max_risk ?? 0;
+  const price = s.price ?? s.current_price ?? s.entry_price ?? s.avg_price ?? s.ltp ?? 0;
+  const stopLoss = s.stop_loss ?? s.stoploss ?? s.sl ?? s.stop ?? 0;
+  const alloc = s.percentage_allocation ?? s.allocation_pct ?? s.alloc_percent ?? s.allocation ?? 0;
+  const shares = s.number_of_shares ?? s.shares ?? s.qty ?? s.quantity ?? 0;
+  const risk = s.risk ?? s.risk_amount ?? s.max_risk ?? 0;
 
   return {
     symbol: s.symbol || s.ticker || '',
@@ -342,24 +337,149 @@ const Navbar = ({ setPage, theme, toggleTheme }) => {
   );
 };
 
-const HomePage = () => (
-  <div className="relative text-center p-8 py-16 md:py-24 overflow-hidden rounded-xl">
-    <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-green-900/30 animate-gradient-xy"></div>
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.5 }} 
-      className="relative z-10"
-    >
-      <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-gray-100 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">
-        Welcome to SentiQuant
-      </h1>
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-        Your AI-powered platform for Swing and Position trading analysis. Get data-driven insights to make smarter investment decisions.
-      </p>
-    </motion.div>
-  </div>
-);
+// --- Updated Home Page Component ---
+const HomePage = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+  
+  const uspCards = [
+    {
+      title: "Real-Time Sentiment That Actually Works for Indian Markets",
+      subtitle: "India-Trained Sentiment Engine",
+      description: "Most sentiment tools are built for US markets and fail on Indian financial language. We trained our engine on 47 Indian companies, 5+ news sources, and MD&A filings, so every signal reflects the reality of NSE markets — not foreign data. You get fresh, India-native sentiment updated in real-time with context, tone, and reliability scores.",
+      highlights: [
+        "Trained on Indian news, results, MD&A, and corporate filings",
+        "Detects tone shifts before price reacts",
+        "Multi-model ensemble → FinBERT + SBERT + keyword + polarity",
+        "Real-time headline + article-level scoring"
+      ],
+      icon: <Activity className="h-8 w-8" />,
+      gradient: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Actionable Signals, Not Just Charts",
+      subtitle: "Smart Technical + Sentiment Recommendation Engine",
+      description: "Stop juggling indicators and guesswork. Our engine blends RSI, MACD, moving averages, volume analysis, and real-time sentiment signals into a single weighted score — giving you clear Buy / Sell / Hold calls with confidence and risk levels. Designed for both swing and position traders.",
+      highlights: [
+        "Unified scoring from sentiment + technicals",
+        "Explains why a stock is Buy/Sell",
+        "Works for both short-term and long-term decisions",
+        "Transparent signals with reasoning, trend strength, and risk score"
+      ],
+      icon: <ClipboardCheck className="h-8 w-8" />,
+      gradient: "from-green-500 to-emerald-500"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % uspCards.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative overflow-hidden">
+      <div className="relative text-center p-8 py-16 md:py-24 overflow-hidden rounded-xl mb-12">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-green-100 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-green-900/30 animate-gradient-xy"></div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.5 }} 
+          className="relative z-10"
+        >
+          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-gray-100 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">
+            Welcome to SentiQuant
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            Your AI-powered platform for Swing and Position trading analysis. Get data-driven insights to make smarter investment decisions.
+          </p>
+        </motion.div>
+      </div>
+
+      {/* USP Carousel Cards */}
+      <div className="max-w-5xl mx-auto px-4 mb-12">
+        <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlide}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              <div className={`bg-gradient-to-br ${uspCards[activeSlide].gradient} p-8 md:p-12 text-white`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-lg">
+                    {uspCards[activeSlide].icon}
+                  </div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wide opacity-90">
+                    {uspCards[activeSlide].subtitle}
+                  </h3>
+                </div>
+                
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  {uspCards[activeSlide].title}
+                </h2>
+                
+                <p className="text-base md:text-lg mb-6 leading-relaxed opacity-95">
+                  {uspCards[activeSlide].description}
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {uspCards[activeSlide].highlights.map((highlight, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + idx * 0.1 }}
+                      className="flex items-start gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-3"
+                    >
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm">{highlight}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Carousel Navigation Dots */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+            {uspCards.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveSlide(idx)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  activeSlide === idx 
+                    ? 'w-8 bg-white' 
+                    : 'w-2 bg-white/50 hover:bg-white/75'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={() => setActiveSlide((prev) => (prev - 1 + uspCards.length) % uspCards.length)}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full transition-all z-20"
+            aria-label="Previous slide"
+          >
+            <ChevronDown className="h-5 w-5 rotate-90 text-white" />
+          </button>
+          <button
+            onClick={() => setActiveSlide((prev) => (prev + 1) % uspCards.length)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full transition-all z-20"
+            aria-label="Next slide"
+          >
+            <ChevronDown className="h-5 w-5 -rotate-90 text-white" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const StocksListPage = ({ onStockSelect }) => {
   const { data, loading, error, execute } = useApi('/api/stocks');
