@@ -1054,6 +1054,11 @@ const App = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+  useEffect(() => {
+    if (window.plausible) {
+      window.plausible('Page_View', { props: { page } });
+    }
+  }, [page]);
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
